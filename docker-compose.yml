@@ -1,2 +1,33 @@
 ---
 version: "3.7"
+  build_service:
+    build: build
+    volumes:
+      - app-volume:/test/target
+      
+  web_service:
+    build: 
+      context: ./web
+    volumes:
+      - app-volume:/usr/local/tomcat/webapps    
+    ports:
+      - 8080:8080
+    depends_on:
+      - build_service
+      - db
+      
+  db:
+    image: mariadb:10.1
+    environment:
+      MARIADB_ROOT_PASSWORD: passroot
+      MARIADB_USER: user
+      MARIADB_PASSWORD: pass
+      MARIADB_DATABASE: database
+    volumes:
+      - dbdata:/var/lib/mysql  
+    ports:
+      - 3306:3306
+
+volumes:
+  app-volume: 
+  dbdata:
